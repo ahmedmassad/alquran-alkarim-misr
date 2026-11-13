@@ -1,0 +1,445 @@
+  <!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>إذاعات القرآن الكريم</title>
+
+  <style>
+    :root {
+      --paper: #f5f2e9;
+      --ink: #1d2923;
+      --green: #345b48;
+      --muted: #777b70;
+      --line: #dcd9cf;
+      --white: #fffef9;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { background: var(--paper); }
+    body { margin: 0; }
+
+    #app {
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Tahoma, Arial, sans-serif;
+    }
+
+    .wrap {
+      width: min(1100px, 91%);
+      margin: auto;
+    }
+
+    header {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-weight: bold;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green);
+      color: white;
+      font-size: 21px;
+    }
+
+    .live {
+      color: var(--green);
+      font-size: 13px;
+    }
+
+    .hero {
+      padding: 55px 0 35px;
+    }
+
+    .eyebrow {
+      color: var(--green);
+      font-size: 13px;
+    }
+
+    h1 {
+      margin: 12px 0;
+      font-size: clamp(40px, 7vw, 68px);
+      font-weight: 500;
+    }
+
+    .intro {
+      color: var(--muted);
+      line-height: 1.9;
+    }
+
+    .player {
+      background: var(--green);
+      color: white;
+      padding: 22px;
+      margin-top: 25px;
+    }
+
+    .player-label {
+      color: #dce6dc;
+      font-size: 13px;
+    }
+
+    #currentStation {
+      margin: 10px 0 16px;
+      font-size: 20px;
+    }
+
+    audio {
+      width: 100%;
+      height: 42px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 38px 0 18px;
+      padding-bottom: 13px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 500;
+    }
+
+    #stationSearch {
+      width: min(320px, 55%);
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      background: var(--white);
+      font: inherit;
+      outline-color: var(--green);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 13px;
+      padding-bottom: 50px;
+    }
+
+    .station-card {
+      min-height: 115px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 17px;
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+
+    .station-name {
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .station-category {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .station-card button {
+      flex: 0 0 auto;
+      padding: 9px 11px;
+      border: 0;
+      background: var(--green);
+      color: white;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .station-card button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    #message {
+      padding: 18px 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    footer {
+      padding: 18px 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 720px) {
+      .cards { grid-template-columns: 1fr; }
+      .section-head {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      #stationSearch { width: 100%; }
+    }
+  </style>
+</head><body><div dir="rtl" lang="ar" id="app">
+  <header class="wrap">
+    <div class="brand">
+      <span class="brand-mark">۞</span>
+      <span>إذاعات القرآن الكريم</span>
+    </div>
+    <span class="live">● بث مباشر</span>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">استمع أينما كنت</div>
+      <h1>أنصت بقلبك.</h1>
+      <p class="intro">اختار إذاعتك من القائمة واضغط تشغيل.</p>
+
+      <div class="player">
+        <div class="player-label">المشغّل</div>
+        <div id="currentStation">جاري تحميل قائمة الإذاعات…</div>
+        <audio id="radio" controls preload="none"></audio>
+      </div>
+
+      <div class="section-head">
+        <h2>قائمة الإذاعات</h2>
+        <input id="stationSearch" type="search" placeholder="ابحث عن إذاعة أو قارئ">
+      </div>
+
+      <div id="message">جاري تحميل القائمة…</div>
+      <div class="cards" id="stationList"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">إذاعة القرآن الكريم — نسأل الله القبول والنفع</footer>
+
+  <script>
+    const Stations = [
+    ["إذاعة صور من حياة الصحابة رضوان الله عليهم","sahabah","منوعات"],
+    ["تراتيل قصيرة متميزة","tarateel","منوعات"],
+    ["إذاعة آيات السكينة","sakeenah","منوعات"],
+    ["إذاعة القرآن الكريم من القاهرة","https://stream.radiojar.com/8s5u5tpdtwzuv","منوعات"],
+    ["إذاعة القرآن الكريم من المملكة العربية السعودية","https://stream.radiojar.com/0tpy1h0kxtzuv","منوعات"],
+    ["إذاعة الحرم المكي","http://r7.tarat.com:8004/stream?type=http&nocache=114","منوعات"],
+    ["إذاعة فتاوى الشيخ ابن عثيمين","https://server03.quran.com.kw:7147/;*.mp3","فتاوى"],
+    ["إذاعة فتاوى الشيخ متولي الشعراوي","https://server03.quran.com.kw:7148/;*.mp3","فتاوى"],
+    ["إذاعة نداء الإسلام","http://n07.radiojar.com/59096z743d0uv?rjttl=5&rj-tok=AAABhF4nOmsAYiG2yPIXYTWJ0w","منوعات"],
+    ["تفسير القرآن الكريم","tafseer","تفسير"],
+    ["سورة البقرة  لعدد من القراء","albaqarah","منوعات"],
+    ["الإذاعة العامة - اذاعة متنوعة لمختلف القراء","mix","منوعات"],
+    ["تلاوات خاشعة","salma","منوعات"],
+    ["أحمد الحواشي","ahmad_alhawashi","قراء"],
+    ["أحمد الطرابلسي","ahmed_altrabulsi","قراء"],
+    ["أحمد الطرابلسي  رواية قالون عن نافع","ahmad_khader_altarabulsi","رواية قالون عن نافع"],
+    ["أحمد بن علي العجمي","ahmad_alajmy","قراء"],
+    ["أحمد خليل شاهين","ahmad_shaheen","قراء"],
+    ["أحمد ديبان","ahmad_deban","قراء"],
+    ["أحمد صابر","ahmad_saber","قراء"],
+    ["أحمد عامر","ahmed_amer","قراء"],
+    ["أحمد نعينع","ahmad_nauina","قراء"],
+    ["أذكار الصباح","athkar_sabah","أذكار"],
+    ["أذكار المساء","athkar_masa","أذكار"],
+    ["أكرم العلاقمي","akram_alalaqmi","قراء"],
+    ["إبراهيم الأخضر","ibrahim_alakdar","قراء"],
+    ["إدريس أبكر","idrees_abkr","قراء"],
+    ["ابراهيم الدوسري  رواية ورش عن نافع","ibrahim_aldosari","رواية ورش عن نافع"],
+    ["الدوكالي محمد العالم  رواية قالون عن نافع","addokali_mohammad_alalim","رواية قالون عن نافع"],
+    ["الرقية الشرعية","roqiah","الرقية الشرعية"],
+    ["الزين محمد أحمد","alzain_mohammad_ahmad","قراء"],
+    ["العيون الكوشي  رواية ورش عن نافع","aloyoon_alkoshi","رواية ورش عن نافع"],
+    ["الفاتح محمد الزبير رواية الدوري عن أبي عمرو","alfateh_alzubair","روايات اخرى"],
+    ["الفتاوى","fatwa","فتاوى"],
+    ["القارئ ياسين رواية ورش عن نافع","alqaria_yassen","رواية ورش عن نافع"],
+    ["المختصر في السيرة النبوية  حلقات مختصرة عن سيرة نبيّنا محمد صلى الله عليه وسلم","almukhtasar_fi_alsiyra","السيرة النبوية"],
+    ["المختصر في تفسير القرآن الكريم","mukhtasartafsir","تفسير"],
+    ["بندر بليله","bandar_balilah","قراء"],
+    ["ترجمة معاني القرآن الكريم باللغة الأوردية  القارئ عبدالباسط عبدالصمد","translation_quran_urdu_basit","ترجمة"],
+    ["ترجمة معاني القرآن باللغة الأسبانية","translation_quran_spanish_afs","ترجمة"],
+    ["ترجمة معاني القرآن باللغة الألبانية","translation_quran_albanian","ترجمة"],
+    ["ترجمة معاني القرآن باللغة الألمانية","translation_quran_german","ترجمة"],
+    ["ترجمة معاني القرآن باللغة الأمازيغية","translation_quran_tamazight","ترجمة"],
+    ["ترجمة معاني القرآن باللغة الأوردية  القارئ عبدالرحمن السديس و سعود الشريم","translation_quran_urdu_sds_shur","ترجمة"],
+    ["ترجمة معاني القرآن باللغة الأوردية  القارئ محمد المنشاوي","translation_quran_urdu_minsh","ترجمة"],
+    ["ترجمة معاني القرآن باللغة الإنجليزية   القارئ عبدالباسط عبدالصمد","translation_quran_english_basit","ترجمة"],
+    ["ترجمة معاني القرآن باللغة الإنجليزية   القارئ عبدالله صفر","translation_quran_english_bsfr","ترجمة"],
+    ["ترجمة معاني القرآن باللغة الإنجليزية  ترجمة والك-  القارئ عبدالباسط عبدالصمد","translation_quran_english_walk_basit","ترجمة"],
+    ["ترجمة معاني القرآن باللغة البرتغالية","translation_quran_portuguese","ترجمة"],
+    ["ترجمة معاني القرآن باللغة البوسنية","translation_quran_bosnia","ترجمة"],
+    ["ترجمة معاني القرآن باللغة التركية","translation_quran_turkish","ترجمة"],
+    ["ترجمة معاني القرآن باللغة الصينية","translation_quran_chinese","ترجمة"],
+    ["ترجمة معاني القرآن باللغة الفارسية","translation_quran_farsi","ترجمة"],
+    ["ترجمة معاني القرآن باللغة الفرنسية","translation_quran_french","ترجمة"],
+    ["ترجمة معاني القرآن باللغة الكردية","translation_quran_kurdish","ترجمة"],
+    ["ترجمة معاني القرآن باللغة المجرية","translation_quran_hungarian","ترجمة"],
+    ["ترجمة معاني القرآن باللغة اليونانية","translation_quran_greek","ترجمة"],
+    ["تكبيرات العيد","eid","منوعات"],
+    ["توفيق الصايغ","tawfeeq_assayegh","قراء"],
+    ["جمال شاكر عبدالله","jamal_shaker_abdullah","قراء"],
+    ["جمعان العصيمي","jamaan_alosaimi","قراء"],
+    ["حاتم فريد الواعر","abdullah_alkandari","قراء"],
+    ["خالد الجليل","khalid_aljileel","قراء"],
+    ["خالد القحطاني","khaled_alqahtani","قراء"],
+    ["خالد المهنا","khalid_almohana","قراء"],
+    ["خالد عبدالكافي","khalid_abdulkafi","قراء"],
+    ["خليفة الطنيجي","khalifa_altunaiji","قراء"],
+    ["زكي داغستاني","zaki_daghistani","قراء"],
+    ["سعد الغامدي","saad_alghamdi","قراء"],
+    ["سعود الشريم","saud_alshuraim","قراء"],
+    ["سهل ياسين","sahl_yassin","قراء"],
+    ["سيد رمضان","sayeed_ramadan","قراء"],
+    ["شيخ أبو بكر الشاطري","shaik_abu_bakr_al_shatri","قراء"],
+    ["شيرزاد عبدالرحمن طاهر","shirazad_taher","قراء"],
+    ["صابر عبدالحكم","saber_abdulhakm","قراء"],
+    ["صلاح البدير","salah_albudair","قراء"],
+    ["صلاح الهاشم","salah_alhashim","قراء"],
+    ["صلاح بو خاطر","slaah_bukhatir","قراء"],
+    ["طارق دعوب  رواية قالون عن نافع","tareq_abdulgani_daawob","رواية قالون عن نافع"],
+    ["عادل الكلباني","adel_alkhalbany","قراء"],
+    ["عادل ريان","adel_ryyan","قراء"],
+    ["عبدالبارئ الثبيتي","abdelbari_altoubayti","قراء"],
+    ["عبدالبارئ محمد","abdulbari_mohammad","قراء"],
+    ["عبدالباسط عبدالصمد","abdulbasit_abdulsamad","قراء"],
+    ["عبدالباسط عبدالصمد  مجود","abdulbasit_abdulsamad_mojawwad","قراء"],
+    ["عبدالباسط عبدالصمد  رواية ورش عن نافع","abdulbasit_abdulsamad_warsh","رواية ورش عن نافع"],
+    ["عبدالرحمن السديس","abdulrahman_alsudaes","قراء"],
+    ["عبدالرحمن الماجد","abdulrahman_almajed","قراء"]
+    ].map(([name, u, category], i) => ({
+      id: String(i + 1),
+      name,
+      category,
+      radio_url: u.startsWith("http") ? u : "https://qurango.net/radio/" + u
+    }));
+    
+
+    const radio = document.getElementById("radio");
+    const currentStation = document.getElementById("currentStation");
+    const stationList = document.getElementById("stationList");
+    const message = document.getElementById("message");
+    const search = document.getElementById("stationSearch");
+
+    let stations = [];
+    let playingButton = null;
+
+    function getStationsFromSource(source) {
+      const match = source.match(
+        /(?:const|let|var)\s+Stations\s*=\s*(\[[\s\S]*?\])\s*;/
+      );
+
+      if (!match) {
+        throw new Error("لم أجد قائمة Stations داخل ملف GitHub.");
+      }
+
+      // يستخرج بيانات القائمة فقط من ملف الإذاعات
+      return new Function('"use strict"; return (' + match[1] + ');')();
+    }
+
+    function renderStations(query = "") {
+      stationList.replaceChildren();
+
+      const filtered = stations.filter(station => {
+        const text = [
+          station.name,
+          station.category,
+          station.radio_name
+        ].filter(Boolean).join(" ").toLowerCase();
+
+        return text.includes(query.trim().toLowerCase());
+      });
+
+      if (!filtered.length) {
+        message.textContent = "مفيش إذاعات مطابقة للبحث.";
+        return;
+      }
+
+      message.textContent = "";
+
+      filtered.forEach(station => {
+        const streamUrl = station.radio_url || station.url || station.stream || "";
+
+        const card = document.createElement("article");
+        card.className = "station-card";
+
+        const info = document.createElement("div");
+
+        const name = document.createElement("div");
+        name.className = "station-name";
+        name.textContent = station.name || station.radio_name || "إذاعة قرآن كريم";
+
+        const category = document.createElement("small");
+        category.className = "station-category";
+        category.textContent = station.category || "إذاعة قرآنية";
+
+        info.append(name, category);
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = streamUrl ? "▶ تشغيل" : "غير متاح";
+        button.disabled = !streamUrl;
+
+        button.addEventListener("click", async () => {
+          if (playingButton && playingButton !== button) {
+            playingButton.textContent = "▶ تشغيل";
+          }
+
+          if (radio.dataset.stream === streamUrl && !radio.paused) {
+            radio.pause();
+            button.textContent = "▶ تشغيل";
+            currentStation.textContent = "تم إيقاف: " + name.textContent;
+            return;
+          }
+
+          radio.dataset.stream = streamUrl;
+          radio.src = streamUrl;
+          radio.load();
+
+          currentStation.textContent = "جاري تشغيل: " + name.textContent;
+          playingButton = button;
+
+          try {
+            await radio.play();
+            button.textContent = "Ⅱ إيقاف";
+          } catch (error) {
+            button.textContent = "▶ تشغيل";
+            currentStation.textContent =
+              "تعذّر تشغيل هذه الإذاعة؛ قد يكون رابطها متوقفًا.";
+          }
+        });
+
+        card.append(info, button);
+        stationList.appendChild(card);
+      });
+    }
+
+    search.addEventListener("input", () => renderStations(search.value));
+
+    radio.addEventListener("pause", () => {
+      if (playingButton) playingButton.textContent = "▶ تشغيل";
+    });
+
+    radio.addEventListener("playing", () => {
+      if (playingButton) playingButton.textContent = "Ⅱ إيقاف";
+    });
+
+    function loadStations() {
+      stations = Stations;
+      renderStations();
+      currentStation.textContent = "اختار إذاعة من القائمة";
+    }
+
+    loadStations();
+  </script>
+</div>
+</body></html>
